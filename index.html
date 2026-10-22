@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+<title>赛博中医院 · Bug 问诊科 | 1024 程序员节特诊</title>
+<meta name="description" content="说出你的 Bug，赛博老中医望闻问切，开处方、摇神签。1024 程序员节限定开诊。">
+<link rel="stylesheet" href="style.css?v=20261022c">
+</head>
+<body>
+
+<canvas id="matrix-bg" aria-hidden="true"></canvas>
+
+<button class="voice-toggle" id="voice-toggle" type="button" aria-label="配音开关" aria-pressed="true" title="老中医配音 开/关">
+  <svg class="vt-svg" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+    <path class="vt-speaker" d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/>
+    <path class="vt-wave1" d="M16 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <path class="vt-wave2" d="M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <path class="vt-mute" d="M15 9.5l5 5M20 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+  <span class="vt-label">配音</span>
+</button>
+<select class="voice-select" id="voice-select" aria-label="选择配音音色" hidden></select>
+
+<main class="app">
+
+  <!-- ========== 第 1 屏：接诊台 ========== -->
+  <section class="screen active" id="screen-intake">
+    <div class="plaque">赛博中医院 · 1024 程序员节特诊</div>
+    <h1 class="title glitch" data-text="Bug 问诊科">Bug 问诊科</h1>
+
+    <!-- 坐堂老郎中：眼睛会随鼠标转，输入主诉时作把脉状 -->
+    <div class="doctor" id="doctor" aria-hidden="true">
+      <svg viewBox="0 0 130 150" width="120" height="138">
+        <!-- 瓜皮帽 -->
+        <ellipse class="doc-hatbrim" cx="65" cy="42" rx="40" ry="9" fill="#1c120b"/>
+        <path class="doc-hat" d="M30 42 Q32 8 65 8 Q98 8 100 42 Z" fill="#241710"/>
+        <path d="M38 40 Q65 30 92 40" fill="none" stroke="#d8a444" stroke-width="2.4" opacity=".85"/>
+        <circle cx="65" cy="9" r="4.5" fill="#d8a444"/>
+        <!-- 脸 -->
+        <ellipse cx="65" cy="62" rx="29" ry="31" fill="#f0d2a6"/>
+        <ellipse cx="45" cy="70" rx="6" ry="4" fill="#d98b78" opacity=".55"/>
+        <ellipse cx="85" cy="70" rx="6" ry="4" fill="#d98b78" opacity=".55"/>
+        <!-- 眉 -->
+        <path d="M45 53 Q52 48 59 52" fill="none" stroke="#2a1a10" stroke-width="3.4" stroke-linecap="round"/>
+        <path d="M71 52 Q78 48 85 53" fill="none" stroke="#2a1a10" stroke-width="3.4" stroke-linecap="round"/>
+        <!-- 眼（瞳孔可动） -->
+        <g>
+          <ellipse cx="52" cy="62" rx="5.4" ry="4.2" fill="#fff6e8"/>
+          <ellipse cx="78" cy="62" rx="5.4" ry="4.2" fill="#fff6e8"/>
+          <g class="doc-pupil">
+            <circle cx="52" cy="62.5" r="2.6" fill="#241208"/>
+            <circle cx="78" cy="62.5" r="2.6" fill="#241208"/>
+          </g>
+        </g>
+        <!-- 鼻 -->
+        <path d="M65 64 Q62 73 66 76 Q70 77 71 74" fill="none" stroke="#c99a6a" stroke-width="2" stroke-linecap="round"/>
+        <!-- 白胡子 -->
+        <g class="doc-beard" fill="#f3ece0">
+          <path d="M50 82 Q65 74 80 82 Q78 92 65 92 Q52 92 50 82 Z"/>
+          <path d="M48 84 Q40 96 46 112 Q52 106 54 92 Z"/>
+          <path d="M82 84 Q90 96 84 112 Q78 106 76 92 Z"/>
+          <path d="M56 90 Q65 98 74 90 Q72 104 65 108 Q58 104 56 90 Z"/>
+        </g>
+        <!-- 身：道袍 -->
+        <path d="M26 150 Q28 104 65 100 Q102 104 104 150 Z" fill="#3a2c1f"/>
+        <path d="M65 100 L65 150" stroke="#d8a444" stroke-width="2" opacity=".7"/>
+        <path d="M40 108 Q65 126 90 108" fill="none" stroke="#55402c" stroke-width="3"/>
+        <!-- 把脉的手（输入时抬起） -->
+        <g class="doc-hand">
+          <circle cx="92" cy="126" r="8" fill="#f0d2a6"/>
+        </g>
+      </svg>
+      <span class="doc-bubble" id="doc-bubble">施主，请坐。</span>
+    </div>
+
+    <p class="hook">说出你的 Bug，本神医包治百病——<br>治不好……也算你的。</p>
+
+    <div class="input-wrap">
+      <textarea id="bug-input" rows="4" maxlength="500"
+        aria-label="描述你的 Bug、报错或烦心事"
+        placeholder="今天，是什么 Bug / 报错 / 烦心事在折磨你？&#10;可以直接粘贴报错日志，也可以说人话。（Ctrl+Enter 直接问诊）"></textarea>
+      <div class="tags" id="quick-tags">
+        <button type="button" class="tag" data-text="线上又崩了！502 告警一直响，救命">线上事故</button>
+        <button type="button" class="tag" data-text="产品经理说需求又变了，上午定的下午推翻">需求又变了</button>
+        <button type="button" class="tag" data-text="Code Review 被怼了，说我这里为什么不用设计模式">CR 被怼</button>
+        <button type="button" class="tag" data-text="环境配置装不上，在我本地明明是好的">环境配置</button>
+        <button type="button" class="tag" data-text="老板说周五下午可以上线，我总觉得哪里不对">周五下午上线</button>
+        <button type="button" class="tag" data-text="TypeError: Cannot read properties of null">null</button>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btn-diagnose" type="button">开始问诊</button>
+    <p class="disclaimer">* 本诊断结果纯属娱乐，但医嘱是认真的</p>
+  </section>
+
+  <!-- ========== 第 2 屏：望闻问切 ========== -->
+  <section class="screen" id="screen-diagnosis">
+    <div class="terminal">
+      <div class="term-head">
+        <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+        <span class="term-title">望闻问切.exe — 赛博老中医终端</span>
+      </div>
+      <div class="term-body" id="term-body"></div>
+      <div class="pulse-scope" id="pulse-scope" hidden>
+        <canvas id="pulse-canvas" height="84" aria-hidden="true"></canvas>
+        <span class="pulse-cap" id="pulse-cap">● REC 脉象波形 · 供老中医参详</span>
+      </div>
+    </div>
+    <button class="btn-skip" id="btn-skip" type="button">跳过等待 &raquo;</button>
+  </section>
+
+  <!-- ========== 第 3 屏：处方 + 神签 ========== -->
+  <section class="screen" id="screen-result">
+    <!-- 病友弹幕：预置弹幕 + 当前主诉混播（不进入诊断书截图） -->
+    <div class="barrage" id="barrage" aria-hidden="true">
+      <div class="barrage-track" id="barrage-track"></div>
+    </div>
+    <div id="capture">
+      <div class="capture-head">
+        <span class="ch">赛博中医院 · Bug 问诊科诊断书</span>
+        <span class="en">CYBER TCM CLINIC · NO.<span id="case-no">000000</span></span>
+        <span class="visitor" id="visitor-no">本院第 0 位就诊病友</span>
+      </div>
+
+      <p class="patient"><span class="pl">主诉</span><span id="patient-text"></span></p>
+
+      <div class="four-dx">
+        <span class="four-label">望闻问切 · 四诊合参</span>
+        <p id="pulse-text"></p>
+      </div>
+
+      <!-- 处方笺 -->
+      <div class="rx-paper" id="rx-paper">
+        <div class="rx-watermark">賽博中醫院</div>
+        <h2 class="rx-title">處方箋</h2>
+        <div class="rx-meta">
+          <span>科别：Bug 问诊科</span>
+          <span id="rx-date"></span>
+        </div>
+
+        <div class="rx-section">
+          <span class="rx-label">药引</span>
+          <p id="rx-yin"></p>
+        </div>
+
+        <div class="rx-section">
+          <span class="rx-label">处方</span>
+          <ul class="herb-list" id="herb-list"></ul>
+        </div>
+
+        <div class="rx-section rx-advice-sec">
+          <span class="rx-label">医嘱</span>
+          <p id="rx-advice"></p>
+        </div>
+
+        <div class="rx-seal">賽博<br>神醫</div>
+      </div>
+
+      <!-- 签筒：处方看完后，由患者主动摇签 -->
+      <div class="shaker idle" id="shaker">
+        <div class="sticks">
+          <span class="stick s1"></span><span class="stick s2"></span>
+          <span class="stick s3"></span><span class="stick s4"></span>
+        </div>
+        <div class="cup"></div>
+        <p class="shake-hint" id="shake-hint">处方已开好——再摇一支程序员神签，看看今日气运？</p>
+        <!-- 诚心槽：亲手摇动签筒时充能，满槽自动出签 -->
+        <div class="sincerity" id="sincerity" hidden>
+          <div class="sinc-bar"><i id="sinc-fill"></i></div>
+          <span class="sinc-label" id="sinc-label">诚心 0%</span>
+        </div>
+        <button class="btn-draw" id="btn-draw" type="button">诚心摇签</button>
+        <button class="btn-direct" id="btn-direct-draw" type="button" hidden>摇不动了，直接出签</button>
+      </div>
+
+      <!-- 神签 -->
+      <div class="fortune" id="fortune" hidden>
+        <div class="f-head"><span class="f-line"></span>程序员神签<span class="f-line"></span></div>
+        <div class="f-level" id="f-level">大吉</div>
+        <div class="f-level-sub" id="f-level-sub"></div>
+
+        <div class="f-rows">
+          <div class="f-row"><span class="fr-label">今日 Bug 等级</span><span class="fr-value" id="f-bug"></span></div>
+          <div class="f-row"><span class="fr-label">PR 一次过率</span><span class="fr-value mono" id="f-pr"></span></div>
+          <div class="f-row"><span class="fr-label">摸鱼指数</span><span class="fr-value stars" id="f-fish"></span></div>
+        </div>
+
+        <div class="f-yiji">
+          <p class="yi"><b>宜</b> <span id="f-yi"></span></p>
+          <p class="ji"><b>忌</b> <span id="f-ji"></span></p>
+        </div>
+
+        <p class="f-quote" id="f-quote"></p>
+        <p class="f-foot">赛博中医院 · 1024 签 · 心诚则灵，不灵再抽</p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-action" id="btn-redraw" type="button" hidden>再抽一签</button>
+      <button class="btn-action primary" id="btn-save" type="button">保存高清 PNG</button>
+      <button class="btn-action" id="btn-save-jpg" type="button">保存轻量 JPG</button>
+      <button class="btn-action" id="btn-copy" type="button">复制发疯文案</button>
+      <button class="btn-action" id="btn-restart" type="button">换个 Bug 再来</button>
+    </div>
+    <p class="save-tip" id="save-tip" hidden></p>
+  </section>
+
+</main>
+
+<script src="app.js?v=20261022c"></script>
+</body>
+</html>
