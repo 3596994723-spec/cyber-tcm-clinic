@@ -744,7 +744,8 @@ body::after {
      绝不压在脸上；窄屏用 vw 兜底，文案折行也不遮五官 */
   position: absolute; left: 100%; top: 2%;
   margin-left: 8px;
-  max-width: 46vw;
+  width: max-content;
+  max-width: 40vw;
   background: rgba(245,236,212,.96);
   color: #3a2c1f;
   font-family: var(--kai); font-size: 13px; line-height: 1.4;
@@ -758,6 +759,18 @@ body::after {
   border: 7px solid transparent; border-right-color: rgba(245,236,212,.96); border-left: 0;
 }
 @keyframes bubblePop { from { opacity: 0; transform: translateY(6px) scale(.9); } to { opacity: 1; transform: none; } }
+/* 窄屏：郎中身侧放不下，气泡移到他左侧（小尖角朝右），横竖都不遮脸 */
+@media (max-width: 600px) {
+  .doc-bubble {
+    left: auto; right: 100%; top: 6%;
+    margin: 0 8px 0 0;
+    max-width: 38vw;
+  }
+  .doc-bubble::after {
+    left: auto; right: -7px; top: 12px;
+    border: 7px solid transparent; border-left-color: rgba(245,236,212,.96); border-right: 0;
+  }
+}
 
 /* ---------- 终端脉象仪 ---------- */
 .pulse-scope {
